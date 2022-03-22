@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: pipeline
+secrets:
+- name: github-auth
+- name: dockerhub-auth
+#- name: dockerhub-cred
+imagePullSecrets: # if you want to pull images from private registry
+- name: dockerhub-auth

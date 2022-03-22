@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: dind-build-push-private
+spec:
+  serviceAccountName: pipeline
+  resources:
+    inputs:
+    - name: source-repo
+      resourceSpec:
+        type: git
+        params:
+          - name: revision
+            value: main
+          - name: url
+            value: https://github.com/kairen/docker-build-push.git
+  taskRef:
+    name: dind-build-push

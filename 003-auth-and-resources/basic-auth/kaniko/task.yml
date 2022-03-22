@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko-build-push
+spec:
+  resources:
+    inputs:
+    - name: source-repo
+      type: git
+  params:
+  - name: repository
+    description: Repository name for Docker Hub
+    type: string
+    default: kairen/docker-build-push
+  - name: tag
+    description: Image tag
+    type: string
+    default: '0.1.0'
+  - name: registry
+    description: Registry URL
+    type: string
+    default: 'docker.io'
+  - name: pathToContext
+    type: string
+    default: .
+  steps:
+  - name: build-and-push
+    image: gcr.io/kaniko-project/executor:latest
+    env:
+    - name: "DOCKER_CONFIG"
+      value: "/tekton/home/.docker/"
+    command: ["/kaniko/executor"]
+    args:
+    - --dockerfile=Dockerfile
+    - --destination=$(params.registry)/$(params.repository):$(params.tag)
+    - --context=$(params.pathToContext)
+    workingDir: $(resources.inputs.source-repo.path)
+  

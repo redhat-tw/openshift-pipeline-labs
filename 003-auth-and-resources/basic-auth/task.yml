@@ -1,0 +1,71 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: dind-build-push
+spec:
+  resources:
+    inputs:
+    - name: source-repo
+      type: git
+  params:
+  - name: repository
+    description: Repository name for Docker Hub
+    type: string
+    default: kairen/docker-build-push
+  - name: tag
+    description: Image tag
+    type: string
+    default: '0.1.0'
+  - name: registry
+    description: Registry URL
+    type: string
+    default: 'docker.io'
+  steps:
+  - name: build-and-push
+    image: docker.io/library/docker:stable
+    env:
+    - name: DOCKER_HOST
+      value: tcp://localhost:2376
+    - name: DOCKER_TLS_VERIFY
+      value: '1'
+    - name: DOCKER_CERT_PATH
+      value: /certs/client
+    - name: "DOCKER_CONFIG"
+      value: "/tekton/home/.docker/"
+    script: |
+      #!/usr/bin/env sh
+
+      # build from git source
+      docker build -t $(params.registry)/$(params.repository):$(params.tag) .
+      docker images
+
+      # ...then run/push it!
+      docker run $(params.registry)/$(params.repository):$(params.tag)
+      docker push $(params.registry)/$(params.repository):$(params.tag)
+
+    volumeMounts:
+      - mountPath: /certs/client
+        name: dind-certs
+    workingDir: $(resources.inputs.source-repo.path)
+  sidecars:
+    - image: docker.io/library/docker:dind
+      name: server
+      args:
+        - --storage-driver=vfs
+        - --userland-proxy=false
+        - --debug
+      securityContext:
+        privileged: true
+      env:
+      - name: DOCKER_TLS_CERTDIR
+        value: /certs
+      volumeMounts:
+      - mountPath: /certs/client
+        name: dind-certs
+      readinessProbe:
+        periodSeconds: 1
+        exec:
+          command: ['ls', '/certs/client/ca.pem']
+  volumes:
+  - name: dind-certs
+    emptyDir: {}
