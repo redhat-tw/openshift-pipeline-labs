@@ -1,0 +1,8 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: dind-build-push
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - triggerRef: dind-build-push-trigger

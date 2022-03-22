@@ -1,0 +1,12 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: dind-build-push
+spec:
+  params:
+  - name: git-url
+    value: $(body.repository.url)
+  - name: git-repo-fullname
+    value: $(body.repository.full_name)
+  - name: git-revision
+    value: $(body.head_commit.id)

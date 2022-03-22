@@ -1,0 +1,37 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: dind-build-push
+spec:
+  params:
+  - name: git-url
+    description: The git repository url
+  - name: git-revision
+    description: The git revision
+    default: main
+  - name: git-repo-fullname
+    description: The full name of the git repo
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: dind-build-push-
+    spec:
+      resources:
+        inputs:
+        - name: source-repo
+          resourceSpec:
+            type: git
+            params:
+              - name: url
+                value: $(tt.params.git-url)
+              - name: revision
+                value: $(tt.params.git-revision)
+      serviceAccountName: pipeline
+      taskRef:
+        name: dind-build-push
+      params:
+      - name: repository
+        value: $(tt.params.git-repo-fullname)
+      - name: tag
+        value: $(tt.params.git-revision)
