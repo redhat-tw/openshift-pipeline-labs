@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: hello-world-taskrun
+spec:
+  taskRef:
+    name: hello-world
+  params:
+  - name: timeSeconds
+    value: "15"
+  podTemplate:
+    # schedulerName: volcano
+    securityContext:
+      # runAsNonRoot: true
+      runAsUser: 0
+    # volumes:
+    #   - name: my-cache
+    #     persistentVolumeClaim:
+    #       claimName: my-volume-claim

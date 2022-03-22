@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-build-id
+spec:
+  description: >-
+    This task generates a unique build id by appending
+    the project name to the current timestamp.
+  params:
+    - name: project
+      description: The name of MLI' project
+      type: string
+  results:
+    - name: timestamp
+      description: Current timestamp
+    - name: buildID
+      description: ID of the current build
+  steps:
+    - name: get-timestamp
+      image: docker.io/library/bash:5.1
+      script: |
+        #!/usr/bin/env bash
+        ts=`date "+%Y%m%d-%H%M%S"`
+        echo "Current Timestamp: ${ts}"
+        echo ${ts} | tr -d "\n" | tee $(results.timestamp.path)
+    - name: get-build-id
+      image: docker.io/library/bash:5.1
+      script: |
+        #!/usr/bin/env bash
+        ts=`cat $(results.timestamp.path)`
+        buildId=$(params.project)-${ts}
+        echo ${buildId} | tr -d "\n" | tee $(results.buildID.path)

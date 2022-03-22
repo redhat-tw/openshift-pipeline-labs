@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: npm-tests
+spec:
+  params:
+  - name: buildID
+    description: A unique build id
+    type: string
+  steps:
+    - name: lint
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm run lint
+      workingDir: $(workspaces.source.path)/$(inputs.params.buildID)
+    - name: test
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm run test
+      workingDir: $(workspaces.source.path)/$(inputs.params.buildID)
+  workspaces:
+    - name: source

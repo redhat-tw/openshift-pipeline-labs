@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: npm-all-in-one
+spec:
+  resources:
+    - name: source-repo
+      resourceSpec:
+        type: git
+        params:
+          - name: revision
+            value: master
+          - name: url
+            value: https://github.com/cdbkr/nuxt
+  podTemplate:
+    securityContext:
+      runAsUser: 0
+  pipelineRef:
+    name: npm-all-in-one

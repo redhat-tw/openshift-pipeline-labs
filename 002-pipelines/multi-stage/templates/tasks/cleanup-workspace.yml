@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup-workspace
+spec:
+  workspaces:
+  - name: source
+  params:
+  - name: buildID
+    description: A unique build id
+    type: string
+  steps:
+    - name: cleanup
+      image: docker.io/library/bash:5.1
+      script: |
+        #!/usr/bin/env bash
+        if [[ -d "$(params.buildID)" ]]; then
+          rm -rf $(params.buildID)
+        fi
+      workingDir: $(workspaces.source.path)

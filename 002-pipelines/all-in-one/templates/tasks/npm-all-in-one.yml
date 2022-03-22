@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: npm-all-in-one
+spec:
+  resources:
+    inputs:
+      - name: git-repo
+        type: git
+  steps:
+    - name: npm-install
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm install
+      workingDir: $(resources.inputs.git-repo.path)
+    - name: lint
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm run lint
+      workingDir: $(resources.inputs.git-repo.path)
+    - name: test
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm run test
+      workingDir: $(resources.inputs.git-repo.path)
+    - name: build
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+        - npm run build
+      workingDir: $(resources.inputs.git-repo.path)

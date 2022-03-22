@@ -1,0 +1,7 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: dind-build-taskrun
+spec:
+  taskRef:
+    name: dind-build

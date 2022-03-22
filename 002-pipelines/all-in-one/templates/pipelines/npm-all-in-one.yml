@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: npm-all-in-one
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+  - name: npm-all-in-one
+    taskRef:
+      name: npm-all-in-one
+      kind: Task
+    resources:
+      inputs:
+      - name: git-repo
+        resource: source-repo

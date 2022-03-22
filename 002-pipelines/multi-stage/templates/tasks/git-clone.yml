@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  resources:
+    inputs:
+      - name: git-repo
+        type: git
+  params:
+  - name: subpath
+    description: Git clone path on workding dir
+    type: string
+  steps:
+    - name: move-repo
+      image: docker.io/library/bash:5.1
+      script: |
+        #!/usr/bin/env bash
+        id
+        mkdir -p $(workspaces.source.path)/$(params.subpath)
+        mv $(resources.inputs.git-repo.path)/{*,.[^.]*} $(workspaces.source.path)/$(params.subpath)/
+      workingDir: $(workspaces.source.path)
+
+    - name: check-repo
+      image: docker.io/library/bash:5.1
+      script: |
+        #!/usr/bin/env bash
+        cd $(params.subpath)/
+        pwd
+        ls -la
+      workingDir: $(workspaces.source.path)
+  workspaces:
+    - name: source

@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonLabels:
+  pipeline: tekton
+resources:
+- templates/tasks/generate-build-id.yml
+- templates/tasks/cleanup-workspace.yml
+- templates/tasks/git-clone.yml
+- templates/tasks/npm-build.yml
+- templates/tasks/npm-install.yml
+- templates/tasks/npm-test.yml
+- templates/pipelines/npm-test-and-build.yml

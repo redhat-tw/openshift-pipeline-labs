@@ -1,0 +1,106 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: npm-test-and-build
+spec:
+  workspaces:
+  - name: shared-workspace
+  resources:
+    - name: source-repo
+      type: git
+    - name: settings-repo
+      type: git
+  tasks:
+  - name: get-build-id
+    taskRef:
+      name: generate-build-id
+      kind: Task
+    params:
+    - name: project
+      value: nuxt
+  
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: Task
+    resources:
+      inputs:
+      - name: git-repo
+        resource: source-repo
+    params:
+    - name: subpath
+      value: "$(tasks.get-build-id.results.buildID)"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - get-build-id
+
+  - name: fetch-settings-repository
+    taskRef:
+      name: git-clone
+      kind: Task
+    resources:
+      inputs:
+      - name: git-repo
+        resource: settings-repo
+    params:
+    - name: subpath
+      value: "$(tasks.get-build-id.results.buildID)/settings"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - get-build-id
+    - fetch-repository
+
+  - name: install
+    taskRef:
+      name: npm-install
+      kind: Task
+    params:
+    - name: buildID
+      value: "$(tasks.get-build-id.results.buildID)"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - fetch-repository
+    - fetch-settings-repository
+
+  - name: tests
+    taskRef:
+      name: npm-tests
+      kind: Task
+    params:
+    - name: buildID
+      value: "$(tasks.get-build-id.results.buildID)"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - install
+
+  - name: build
+    taskRef:
+      name: npm-build
+      kind: Task
+    params:
+    - name: buildID
+      value: "$(tasks.get-build-id.results.buildID)"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - tests
+  
+  finally:
+  - name: cleanup
+    taskRef:
+      name: cleanup-workspace
+    params:
+    - name: buildID
+      value: "$(tasks.get-build-id.results.buildID)"
+    workspaces:
+    - name: source
+      workspace: shared-workspace

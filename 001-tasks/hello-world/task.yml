@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-world
+spec:
+  params:
+  - name: message
+    type: string
+    description: The message to print in container logs
+    default: "Hello World!!!"
+  - name: timeSeconds
+    type: string
+    description: Sleep time seconds
+    default: "30"
+  results: # Alpha feature
+  - name: message
+    description: Output message
+  steps:
+  - name: echo-message
+    image: docker.io/library/ubuntu:20.04
+    script: |
+      #!/usr/bin/env bash
+      echo "$(params.message)" | tr -d "\n" | tee $(results.message.path)
+
+  - name: exit-code
+    image: docker.io/library/ubuntu:20.04
+    onError: continue
+    command: ["/bin/bash", "-c"]
+    args:
+    - |-
+      echo "$(params.message)" | tr -d "\n" | tee $(results.message.path1)
+      exit 1
+
+  - name: sleep-then-timeout
+    image: docker.io/library/ubuntu:20.04
+    env:
+    - name: TIME_SECONDS
+      value: "$(params.timeSeconds)"
+    script: |
+      #!/usr/bin/env bash
+      echo "I am supposed to sleep for ${TIME_SECONDS} seconds!"
+      sleep ${TIME_SECONDS}
+    timeout: 35s

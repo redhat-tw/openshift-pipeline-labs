@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: npm-build
+spec:
+  params:
+  - name: buildID
+    description: A unique build id
+    type: string
+  steps:
+    - name: build
+      image: image-registry.openshift-image-registry.svc:5000/openshift/nodejs:12
+      command: ["/bin/bash", "-c"]
+      args:
+      - npm run build
+      workingDir: $(workspaces.source.path)/$(inputs.params.buildID)
+  workspaces:
+    - name: source
