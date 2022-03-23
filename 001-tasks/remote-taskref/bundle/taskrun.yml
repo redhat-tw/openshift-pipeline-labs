@@ -1,0 +1,8 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: task-reference-bundle
+spec:
+  taskRef:
+    name: hello-world-task
+    bundle: docker.io/kairen/tekton-bundle:0.1.0

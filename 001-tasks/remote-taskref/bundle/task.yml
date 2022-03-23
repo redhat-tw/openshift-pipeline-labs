@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-world-task
+spec:
+  steps:
+    - image: docker.io/library/ubuntu:20.04
+      env:
+      - name: HOME
+        value: /tekton/home
+      script: |
+        #!/usr/bin/env bash
+
+        [[ $HOME == /tekton/home ]] && echo "Hello World!!"

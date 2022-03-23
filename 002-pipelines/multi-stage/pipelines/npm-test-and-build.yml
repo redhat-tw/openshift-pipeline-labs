@@ -69,6 +69,7 @@ spec:
     - fetch-settings-repository
 
   - name: tests
+    retries: 1
     taskRef:
       name: npm-tests
       kind: Task

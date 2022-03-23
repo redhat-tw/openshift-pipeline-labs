@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: task-reference-git
+spec:
+  taskRef:
+    resolver: git
+    resource:
+    - name: repo
+      value: https://github.com/kairen/openshift-pipeline-labs.git
+    - name: commit
+      value: 5194320ece615b58ed1a40843f19c5836728d7c9
+    - name: path
+      value: 001-tasks/remote-taskref/bundle/task.yml
