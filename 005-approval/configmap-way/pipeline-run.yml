@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: approve-pipelinerun
+spec:
+  workspaces:
+  - name: workspace
+    configmap:
+      name: approval-cm
+  pipelineRef:
+    name: approve-pipeline

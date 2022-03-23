@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: approve-task
+spec:
+  workspaces:
+  - name: data
+  params:
+  - name: timeout
+    description: The max seconds to approve
+    type: string
+    default: "600"
+  steps:
+  - name: sleep-a-while
+    image: docker.io/library/bash:5.1
+    script: |
+      #!/usr/bin/env bash
+
+      end=$((SECONDS+$(params.timeout)))
+      while [ $SECONDS -lt $end ]; do
+        name=$(cat "$(workspaces.data.path)"/status)
+        if [ "$name" = "success" ]
+        then
+          echo "approved!"
+          exit 0
+        elif [ "$name" = "refused" ]
+        then
+          echo "refused!"
+          exit 1
+        fi
+        sleep 2
+        echo "waiting"
+      done
+      echo "too long not to approve"
+      exit 1

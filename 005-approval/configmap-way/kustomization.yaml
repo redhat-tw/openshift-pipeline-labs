@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonLabels:
+  pipeline: tekton
+resources:
+- tasks/approve.yml
+- tasks/bash.yml
+- pipelines/pipeline.yml
+- data/approval-cm.yml

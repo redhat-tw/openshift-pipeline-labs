@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: something
+  annotations:
+    description: |
+      A simple task that do something
+spec:
+  steps:
+  - name: do-something
+    image: docker.io/library/bash:5.1
+    script: |
+      #!/usr/bin/env bash
+      uname -a

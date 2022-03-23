@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: approve-pipeline
+spec:
+  workspaces:
+  - name: workspace
+  tasks:
+  - name: wait-for-approve
+    workspaces:
+    - name: data
+      workspace: workspace
+    taskRef:
+      name: approve-task
+  - name: do-something
+    taskRef:
+      name: something
+    runAfter:
+      - wait-for-approve
