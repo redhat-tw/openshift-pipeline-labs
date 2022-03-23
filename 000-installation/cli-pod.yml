@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: oc-cli
+  name: oc-cli
+spec:
+  volumes:
+  - name: pipeline-data
+    persistentVolumeClaim:
+      claimName: cli-pv-claim
+  containers:
+  - image: default-route-openshift-image-registry.apps.cluster-8grb5.8grb5.sandbox1086.opentlc.com/openshift/cli:latest
+    imagePullPolicy: Always
+    name: oc-cli
+    stdin: true
+    stdinOnce: true
+    tty: true
+    volumeMounts:
+    - mountPath: "/opt/pipeline"
+      name: pipeline-data
+  restartPolicy: Always
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cli-pv-claim
+spec:
+  storageClassName: gp2
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
