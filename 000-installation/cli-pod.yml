@@ -16,6 +16,8 @@ spec:
     stdin: true
     stdinOnce: true
     tty: true
+    securityContext:
+      runAsUser: 0
     volumeMounts:
     - mountPath: "/opt/pipeline"
       name: pipeline-data
