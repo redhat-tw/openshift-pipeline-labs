@@ -1,12 +1,8 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: npm-multi-stag-run
+  generateName: npm-multi-stag-pr-
 spec:
-  timeouts:
-    pipeline: "0h5m0s"
-    tasks: "0h15m0s"
-    finally: "0h5m0s"
   resources:
     - name: source-repo
       resourceSpec:

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: npm-all-in-one
+  generateName: npm-all-in-one-pr-
 spec:
   resources:
     - name: source-repo
