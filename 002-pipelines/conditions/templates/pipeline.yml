@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: download-and-unarchive
+spec:
+  workspaces:
+  - name: shared-workspace
+  params:
+  - name: baseURL
+    type: string
+    description: The base URL for downloading file
+  - name: fileName
+    type: string
+    description: The file name
+  - name: timeoutSeconds
+    type: string
+    description: Sleep time seconds
+    default: "60s"
+  tasks:
+  - name: download
+    taskRef:
+      name: download-file
+      kind: Task
+    params:
+    - name: baseURL
+      value: $(params.baseURL)
+    - name: fileName
+      value: $(params.fileName)
+    - name: timeoutSeconds
+      value: $(params.timeoutSeconds)
+    workspaces:
+    - name: shared
+      workspace: shared-workspace
+
+  - name: check-file-exists
+    conditions:
+    - conditionRef: file-exists
+      params:
+      - name: filePath
+        value: $(tasks.download.results.fileRelativePath)
+      workspaces:
+      - name: shared
+        workspace: shared-workspace
+
+  - name: unarchive-file
+    taskRef:
+      name: unarchive-file
+      kind: Task
+    params:
+    - name: filePath
+      value: $(tasks.download.results.fileRelativePath)
+    workspaces:
+    - name: shared
+      workspace: shared-workspace

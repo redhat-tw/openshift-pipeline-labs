@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: download-file
+spec:
+  workspaces:
+  - name: shared
+  params:
+  - name: baseURL
+    type: string
+    description: The base URL for downloading file
+  - name: fileName
+    type: string
+    description: The file name
+  - name: timeoutSeconds
+    type: string
+    description: Sleep time seconds
+    default: "60s"
+  - name: relativePath
+    type: string
+    description: Relative path for storing file
+    default: ""
+  results: # Alpha feature
+  - name: fileRelativePath
+    description: Output file relative path
+  steps:
+  - name: download
+    image: docker.io/library/alpine:3.15
+    script: |
+      #!/usr/bin/env bash
+
+      apk update && apk add --no-cache curl ca-certificates
+      
+      FILE_PATH=""
+      if [[ -z "$(params.baseURL)" ]]; then
+        FILE_PATH="$(params.fileName)"
+      else
+        FILE_PATH="$(params.relativePath)/$(params.fileName)"
+        mkdir -p $(params.relativePath)
+      fi
+      
+      curl $(params.baseURL)/$(params.fileName) -o ${FILE_PATH}
+      echo "${FILE_PATH}" | tr -d "\n" | tee $(results.fileRelativePath.path)
+    timeout: $(params.timeoutSeconds)
+    workingDir: $(workspaces.shared.path)
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: unarchive-file
+spec:
+  workspaces:
+  - name: shared
+  params:
+  - name: filePath
+    type: string
+    description: The base URL for downloading file
+  steps:
+  - name: unarchive
+    image: docker.io/library/alpine:3.15
+    script: |
+      #!/usr/bin/env bash
+      
+      tar xvf $(params.filePath)
+      ls -lh
+    workingDir: $(workspaces.shared.path)

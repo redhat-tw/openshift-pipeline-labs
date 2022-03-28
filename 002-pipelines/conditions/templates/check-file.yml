@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Condition
+metadata:
+  name: file-exists
+spec:
+  workspaces:
+  - name: shared
+  params:
+  - name: filePath
+    type: string
+    description: The base URL for downloading file
+  check:
+    image: docker.io/library/alpine:3.15
+    script: |
+      #!/usr/bin/env sh
+
+      test -f $(params.filePath)
+    workingDir: $(workspaces.shared.path)

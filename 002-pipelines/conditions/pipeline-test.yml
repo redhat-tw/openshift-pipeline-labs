@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: download-and-unarchive-
+spec:
+  timeouts:
+    pipeline: "0h5m0s"
+  podTemplate:
+    securityContext:
+      runAsUser: 0
+  pipelineRef:
+    name: download-and-unarchive
+  workspaces:
+  - name: shared-workspace
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: gp2-csi
