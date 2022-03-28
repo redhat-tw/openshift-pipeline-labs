@@ -3,10 +3,10 @@ kind: Kustomization
 commonLabels:
   pipeline: tekton
 resources:
-- tasks/generate-build-id.yml
-- tasks/cleanup-workspace.yml
-- tasks/git-clone.yml
-- tasks/npm-build.yml
-- tasks/npm-install.yml
-- tasks/npm-test.yml
-- pipelines/npm-test-and-build.yml
+- templates/tasks/generate-build-id.yml
+- templates/tasks/cleanup-workspace.yml
+- templates/tasks/git-clone.yml
+- templates/tasks/npm-build.yml
+- templates/tasks/npm-install.yml
+- templates/tasks/npm-test.yml
+- templates/pipelines/npm-test-and-build.yml

@@ -3,5 +3,5 @@ kind: Kustomization
 commonLabels:
   pipeline: tekton
 resources:
-- tasks/npm-all-in-one.yml
-- pipelines/npm-all-in-one.yml
+- templates/task.yml
+- templates/pipeline.yml
